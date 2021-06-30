@@ -1,0 +1,9 @@
+table {
+	border: 2px solid #7facc9;
+}
+thead th {
+	border: 2px solid #7facc9;
+}
+tbody td {
+	border: 1px solid #cccccc;
+}

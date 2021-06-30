@@ -1,0 +1,37 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+  install:
+    runtime-versions:
+      java: corretto11
+    commands:
+      - echo angular-cli のインストール
+      - npm install -g
+      - npm install --save-dev @angular-devkit/build-angular
+      - npm install -g @angular/cli
+  build:
+    commands:
+      - echo WAR ビルド開始 on `date`
+      - ng build -c production --prod
+      - mkdir target
+      - (cd dist/sample1-pl; jar cvf ../../target/sample1-pl-0.0.1-SNAPSHOT.war .)
+      - echo Docker イメージビルド開始 on `date`
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Docker イメージビルド完了 on `date`
+      - echo イメージを ECR にプッシュ...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo コンテナ定義ファイル（imagedefinitions.json）作成
+      - printf '[{"name":"sample-pl","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG > imagedefinitions.json
+artifacts:
+  files:
+    - target/*.war
+    - imagedefinitions.json
+  discard-paths: yes
+

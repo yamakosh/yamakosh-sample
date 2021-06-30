@@ -1,0 +1,33 @@
+<h2>部品在庫管理コンポーネント</h2>
+<form>
+	<table>
+		<thead>
+			<tr>
+				<th>コード</th>
+				<th>名前</th>
+				<th>単価</th>
+				<th>数量</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let parts of partslist; let in = index" (click)="onSelect(parts)">
+				<td>{{parts.code}}</td>
+				<td><input type="text" name="prname-{{in}}" [(ngModel)]="parts.name" /></td>
+				<td><input type="text" name="prcost-{{in}}" [(ngModel)]="parts.cost" /></td>
+				<td><input type="text" name="prnmbr-{{in}}" [(ngModel)]="parts.nmbr" /></td>
+				<td>
+					<button (click)="onUpdate(parts)">更新</button>
+					<button (click)="onDelete(parts)">削除</button>
+				</td>
+			</tr>
+			<tr>
+				<td><input type="text" name="pcode" [(ngModel)]="newParts.code" /></td>
+				<td><input type="text" name="pname" [(ngModel)]="newParts.name" /></td>
+				<td><input type="text" name="pcost" [(ngModel)]="newParts.cost" /></td>
+				<td><input type="text" name="pnmbr" [(ngModel)]="newParts.nmbr" /></td>
+				<td><button (click)="onCreate(newParts)">登録</button></td>
+			</tr>
+		</tbody>
+	</table>
+</form>
